@@ -1,0 +1,7 @@
+model: gpt-4o-mini
+max_tool_rounds: 10
+auto_yes: false
+temperature: 0.2
+session_dir: part2/sessions
+system_prompt_template: part2/prompts/system.j2
+max_tool_output_chars: 4000

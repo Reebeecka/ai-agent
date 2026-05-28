@@ -1,0 +1,170 @@
+agent_name: rebecka-vannerberg
+agent_role: "SWE kodskrivare — implementerar tilldelade moduler (core/logik), inte UI/test/review"
+agent_role_mode: writer
+model: gpt-4o-mini
+hub_url: https://z0yncxbipft4e8-8080.proxy.runpod.net
+hub_password: "${HUB_PASSWORD}"
+poll_interval_sec: 4
+jitter_sec: 2
+
+# Lämna null för att inte ha någon lokal cap — hubben enforcear sin cap ändå.
+# Sätt ett tal om du vill stoppa loopen tidigare (t.ex. testkörning).
+max_messages_to_send: null
+
+# Hubbens egen cap per agent (för medvetenhet — vi pratar inte mer än så).
+# Just nu 10/agent enligt GraderBot (2026-05-26). Justera om läraren höjer.
+hub_per_agent_cap: 10
+# När messages_sent når detta tal skiftar vi till konservativt läge:
+# högre rate-limit och striktare PASS-tröskel så vi sparar de sista till
+# viktiga svar. Med 10-cap → tröskel vid 7.
+conservative_threshold: 7
+conservative_rate_limit_sec: 10
+# Om hubben returnerar 429 (cap nådd eller rate-limit) — vänta så här lång tid
+# innan vi försöker posta igen. Vi fortsätter polla under tiden så vi har
+# kontext om/när läraren höjer cappet.
+cap_retry_sec: 300
+
+default_rate_limit_sec: 4
+# Token-budget för OpenAI-anrop. `null` = obegränsad (agenten räknar
+# fortfarande tokens för stats, men slutar aldrig att kalla LLM:n).
+# Sätt ett tal om du vill ha ett tak — vid överskridning går agenten in
+# i passive mode (pollar fortsätter, inga nya LLM-anrop) och du kan höja
+# via `set budget <N>` i konsolen, eller slå av igen med `set budget off`.
+default_token_budget: 50000
+max_tool_rounds: 20
+auto_yes: false
+
+# Deterministiska "svara alltid"-triggers. Pre-filter matchar dessa innan
+# LLM-gating körs — sparar token-budget och garanterar att vi inte missar
+# direkta tilltal eller broadcast-frågor.
+name_aliases:
+  - rebecka
+  - rebecka-vannerberg
+  - "@rebecka"
+  - "@rebecka-vannerberg"
+broadcast_phrases:
+  - "all agents"
+  - "alla agenter"
+  - "everyone"
+  - "alla "
+  - "hej alla"
+  - "hej allihop"
+  - "anyone"
+  - "någon som"
+# Frågor som matchar dessa nyckelord behandlas som kompetens-relevanta.
+# Behåll listan smal — bredare lista = mer chat-spam.
+competence_keywords:
+  - "implementera"
+  - "skriv kod"
+  - "kodskriv"
+  - "beräkningslogik"
+  - "modul"
+  - "core-modul"
+  - "file_create"
+  - "funktioner"
+  - "core"
+  - "logik"
+  - "python"
+  - "debug"
+  - "buggen"
+  - "traceback"
+  - "exception"
+  - "error:"
+
+# Cool-down efter egen post för att inte spamma sin egen tråd:
+# vänta tills minst N andra agenter pratat ELLER M sekunder gått
+# (innan vi själva svarar igen — om vi inte är direkt tilltalade vid namn).
+cooldown_other_msgs: 2
+cooldown_seconds: 30
+
+# Greeting som postas en gång när agenten joinar rummet. Placeholders:
+# {agent_name}, {agent_role}. Tom sträng = ingen greeting.
+# Postas INTE om hubben redan har ett meddelande från {agent_name} (skydd
+# mot dubbel-greeting vid omstart) och räknas mot hub-cappet.
+join_greeting: "Hej! Jag är {agent_name}. Min roll: {agent_role}. Tagga mig för implementation av en smal modul — jag samarbetar (UI/test/review gör andra). Konvention: Bekräftat jag tar… / Jag tar mig an… / Klar med…"
+
+# Auto-detection: vid träff i inkommande chat-meddelanden får du y/n i
+# terminalen — ingen omstart. Sätt false för att bara styra via config/konsol.
+auto_detect_project_mode: true
+auto_detect_github_mode: true
+# Fras-listor (substring-match, case-insensitive). Utöka vid behov.
+project_detect_phrases:
+  - "kodprojekt"
+  - "bygg ett projekt"
+  - "bygg projekt"
+  - "skapa ett projekt"
+  - "skapa projekt"
+  - "gemensamt projekt"
+  - "arbeta tillsammans"
+  - "alla agenter kan"
+  - "skapa en app"
+  - "skapa ett spel"
+  - "skriv kod"
+  - "implementera"
+  - "PROJECT:"
+  - "TASK:"
+github_detect_phrases:
+  - "github"
+  - "github.com"
+  - "git clone"
+  - "git push"
+  - "git commit"
+  - "klona repo"
+  - "pusha till"
+  - "pull request"
+  - "gh pr"
+  - "REPO:"
+  - "BRANCH:"
+
+# Project-mode: tvingar file-tools (file_read/file_edit/file_create) och
+# bash (cwd) till en specifik workspace-mapp. Kan aktiveras vid start ELLER
+# via auto-detection / `enable project` i konsolen. Default OFF.
+#
+# Vad det ändrar:
+#   - workspace-spärr på file-tools (path traversal blockeras)
+#   - bash kör med cwd=project_workspace
+#   - system-prompten får en sektion om "du jobbar nu i mapp X"
+project_mode: false
+# Relativ sökväg från assignment2/. Skapas automatiskt om den inte finns.
+project_workspace: agent_workspace
+
+# Github-mode: bygger ovanpå project_mode och lägger till git/gh-allowlist
+# samt deny-mönster mot GITHUB_TOKEN-läckage. Kräver project_mode: true.
+# Use case: klona repo, editera, committa, push, gh pr create.
+#
+# Vad det ändrar (utöver project_mode):
+#   - utökad safety-allowlist (clone/add/commit/push/checkout/merge/...)
+#   - extra deny mot GITHUB_TOKEN/printenv/env-pipes
+#   - tvingad y/n-prompt även om auto_yes=true
+github_mode: false
+# Hint till system-prompten om vilket konto/branch som är "ditt" så modellen
+# vet vart den får pusha.
+github_owner: ""
+github_default_branch: "main"
+
+# Hub-koordinering: Bekräftat jag tar / Jag tar mig an / Klar med (klasskonvention).
+hub_coordination: true
+
+# Samarbete: respektera andras CLAIM, smal scope, trimma stora kodblock i hub.
+collaboration_mode: true
+collaboration_max_hub_code_lines: 35
+# Vid "dela hela filen" / "fortsätt rebecka" — ingen trunkering i hub.
+collaboration_full_file_triggers: true
+collaboration_skip_duplicate_attach: true
+
+# Spara kopia av all kod (```-block + file_create) under agent_workspace/.
+persist_chat_code_to_workspace: true
+# false = full kod kvar i hubben OCH sparad lokalt (default). true = trimma chat.
+hub_chat_trim_codeblocks: false
+hub_chat_max_codeblock_lines: 12
+
+# file-tools/bash cwd även utan project_mode — filer hamnar i agent_workspace/.
+tools_use_agent_workspace: true
+
+# Efter file_create: bifoga extra kod i hub. full = hela filen (utöver LLM-text).
+hub_attach_mode: full
+auto_attach_code_on_deliver: true
+auto_attach_max_total_chars: 2800
+auto_attach_max_lines_per_file: 100
+
+system_prompt_template: part3/prompts/system.j2

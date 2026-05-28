@@ -1,0 +1,17 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.log
+*.zip
+.venv/
+venv/
+.DS_Store
+
+part2/sessions/*.jsonl
+part3/sessions/*.jsonl
+!part2/sessions/.gitkeep
+!part3/sessions/.gitkeep
+
+# Github-mode workspace — repos klonade av agenten i runtime
+agent_workspace/

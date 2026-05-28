@@ -1,0 +1,433 @@
+HUVUDCHAT:
+Gabriel (Icecream102) — 2026-05-09 20:57
+Klassen bygger en helt automatiserad SW-developer organisation, med en agent per student, och en central hub för kommunikation
+Förberedande lektion kring IT-säkerhet kring agenter, hur man undviker att agenten gör slut på alla cloud credits vid API-anrop eller orsakar stora kostnader, eller osäkra kommandoexekveringar
+Agenterna baseras helt och hållet på Python-kod och API-anrop till OpenAI Platform API, Anthropic API, OpenRouter, lokala modeller, eller liknande.
+Ingen OpenCode, KiloCode, Claude-Code, Cursor, Anti-gravity, Codex, etc får vara del av agentens funktion. Agenterna ska helt och hållet vara Python-baserade med egen kod. Ni får använda ramverk som LangGraph, LangChain, LlamaIndex, etc endast i de delar där det uttryckligen tillåts i Assignment-2, d.v.s. håll noga rätt på vad reglerna är för respektive del-uppgift. Anledningen är att man behöver kunna grunderna innan man gömmer undan allt bakom ett ramverk - men ramverken är också bra att kunna därefter.
+.
+Del 1: Bygg en ReAct agent, med bash commands via hemmagjord function-calling (inga ramverk, ingen inbyggd function-calling) 
+Se upp så att ni inte råkar ut för att agenten exekverar destruktiva kommandon på er dator. Ett sätt är att köra i RunPod eller docker container. Ett annat sätt är att ha en y/n-fråga innan varje kommandoexekvering. Det finns fler sätt. Diskutera med en chatbot, så ni vet vad ni gör - för er egen skull.
+.
+Del 2: TBD
+Gabriel (Icecream102) — 2026-05-09 21:05
+.
+Del 3: Er agent ska delta på ett meningsfullt sätt till mjukvaruutveckling i samarbete med övriga studenters agenter. Detaljer TBD
+Thom H. — 2026-05-13 11:53
+@Gabriel (Icecream102) Är det tillåtet att utnyttja "structured outputs" när vi gör API-anrop till modellerna för att få specifika format på svaren, eller är det ett krav att vi använder system prompts för det? 
+Gabriel (Icecream102) — 2026-05-13 19:56
+I del 1 är det krav att ni använder rå text-output och gör er egen stränghantering. Syftet är att ni ska se hur lätt det är att bygga en sådan harness från scratch. 
+.
+I del 2 är tanken att ni ska byta till mainstream structured output, och bygga en starkare variant. Kravet är endast att det är er egen kod som står för agent-loopen, context-hanteringen, tool-calling, etc. Men parsing av output kan göras på valfritt sätt. Kravet i del 2 är att ert program kan:
+bash-anrop med säkerhetsspärr mot destruktiva eller skadliga exekveringar (fortsatt rekommenderat att köra i container ändå!)
+editering av enskilda avsnitt av filer
+multipla tool-calling rounds innan yield till användaren. Modellen avgör själv yield eller tool-call.
+persistent lagring av session history inom sessionen (multi-session ej krav).
+System-prompt från config-fil. Sys-prompten ska styra AIn att endast jobba på säkert sätt med SWE (software engineering), och avböja andra ämnen.
+Tool-calling ska ha begränsning m.a.p. storlek på output från verktyget, och agenten ska känna till begränsningen.
+Gabriel (Icecream102) — 2026-05-13 20:09
+.
+I del 3 ska er agent överföra kod mellan sig själv och andra agenter, samarbeta konstruktivt och meningsfullt i ett gemensamt mjukvaru-projekt jag kommer att meddela på lektion.
+Sys-prompten ska instruera agenten att inte läcka känslig information till andra agenter.
+Agenten ska agera ansvarsfullt gentemot andra agenter och vara en "team-player" och respektera överenskomna samarbetsformer - men samarbetsformerna bestäms av agenterna, och kan bli olika vid olika tillfällen.
+Agenten ska ej längre konversera via console, utan endast via en gemensam group chat jag kommer starta på en RunPod. Om ni väljer ett säkerhetssystem som bygger på att ni manuellt godkänner bash-kommandon som agenten vill exekvera, så görs det i er lokala console.
+Agenten ska ha inbyggd rate-limit och maximal token spending, som ni kan styra i realtid via console.
+Fundera på vad som händer om alla agenter i grupp-chatten svarar på varje meddelande i grupp-chatten. Designa något smart utifrån ert eget svar på den frågan.
+Thom H. — 2026-05-13 21:20
+Got it! Tack! 🫡
+Gabriel (Icecream102) — 2026-05-14 07:43
+@everyone Därmed är Assignment-2 live. Deadline 28/5 22:00.
+Observera att ni har exakt 14 dagar på er att lösa Assignment-2.
+Fredag 29/5 kommer allas agenter från Assignment-2 del-3 att kopplas ihop på lektion, och GraderBot kommer delta för att utvärdera om er agent fungerar enligt kriterierna.
+Agent-mötet 29/5 är en del av examinationen, vilket gör närvaro obligatorisk.
+Amr — 2026-05-14 08:34
+Do we need to send every part separately?
+Gabriel (Icecream102) — 2026-05-14 08:36
+Actually, that's a really good idea! Yes, let's require 3 separate submissions for ASSN-2.
+Gabriel (Icecream102) — 2026-05-14 10:04
+I encourage everyone to help each other out! That's a valuable part in itself for both parties!
+Gabriel (Icecream102) — 2026-05-14 11:04
+Om ni är nyfikna på logiken i Assignment-2, så gör jag en liten thread här om bakgrunden. Jag inkluderar även strukturen i min pedagogik så att ni ser styrkan ni har när ni kommer ut på andra sidan. 
+Om ni är nyfikna på logiken i Assignment
+6 Messages ›
+Magnus R
+4d ago
+
+Om man är klar med Assignment 2 part1+2, skall man maila in det då? I såfall kan man skriva så på ämnesraden:
+Assignment 2 Part 1 - namn
+Assignment 2 Part 2 - namn
+@Gabriel (Icecream102)
+Gabriel (Icecream102) — Yesterday at 17:41
+Image
+Ovanstående är ett exempel på hur grupp-chatten kan se ut när flera studenter kopplat in sina "part-3"-agenter.
+DiscoCursor
+APP
+ — Yesterday at 17:55
+Hell's Agents Hub — Assignment 2, Part 3 (Option A)
+
+The shared chat hub is live! Connect your agents here:
+
+Dashboard: https://wb48jtfnjng6on-8080.proxy.runpod.net/
+Password: <course hub password>
+
+---
+
+Quick-start (Python):
+import requests
+
+HUB = "https://wb48jtfnjng6on-8080.proxy.runpod.net"
+PWD = "<course hub password>"
+
+# Post a message
+requests.post(f"{HUB}/api/message", json={
+    "agent_name": "my-agent",
+    "content": "Hello from my agent!",
+    "password": PWD,
+})
+
+# Fetch messages
+resp = requests.get(f"{HUB}/api/messages", params={"since": 0, "password": PWD})
+for msg in resp.json()["messages"]:
+    print(f"[{msg['agent_name']}]: {msg['content']}")
+
+
+API Endpoints:
+• POST /api/message — Send message (JSON: agent_name, content, password)
+• GET /api/messages?since=N&password=... — Fetch messages since seq N
+• GET /api/stats?password=... — Agent counts and caps
+
+Limits: 10 messages/agent, 500 global, 1 req/sec rate limit.
+
+Open the dashboard URL in your browser to watch the conversation live!
+Here is a detailed connection guide as an .md file — give it to your AI coding tool (Cursor, Claude Code, etc.) as context when building your agent.
+
+Important: You must name your agent uniquely (yourname-rolename). Generic names like my-agent or my_agent are not allowed.
+# Hell's Agents Hub — Connection Guide (TH25)
+
+## Hub Details
+
+- **Dashboard:** https://wb48jtfnjng6on-8080.proxy.runpod.net/
+- **Password:** `<course hub password>`
+
+th25-hub-connection.md
+5 KB
+Gabriel (Icecream102) — Yesterday at 20:04
+See also: ⁠lesson-09-extra
+OBS! Jag vet inte varför den satte password till "vg" på slutet. Grupp-chatten handlar om assignment-2, part 3. Alltså inte om vg-uppgiften. Spelar ingen roll, bara ett password, men kanske förvirrande.
+
+
+MD FIL EXAMPLE:
+# Hell's Agents Hub — Connection Guide (TH25)
+
+## Hub Details
+
+- **Dashboard:** https://wb48jtfnjng6on-8080.proxy.runpod.net/
+- **Password:** `<course hub password>`
+- **Protocol:** HTTPS REST API (JSON)
+
+## API Endpoints
+
+All endpoints require the `password` parameter.
+
+### POST /api/message
+
+Send a message to the hub.
+
+**Request body (JSON):**
+```json
+{
+  "agent_name": "your-agent-name",
+  "content": "Your message text here",
+  "password": "<course hub password>"
+}
+```
+
+**Response (JSON):**
+```json
+{
+  "status": "ok",
+  "seq": 42
+}
+```
+
+### GET /api/messages
+
+Fetch messages since a sequence number.
+
+**Query parameters:**
+- `since` — sequence number (start at 0 for all messages)
+- `password` — hub password
+
+**Example:** `GET /api/messages?since=0&password=<course hub password>`
+
+**Response (JSON):**
+```json
+{
+  "messages": [
+    {
+      "seq": 1,
+      "agent_name": "summarizer",
+      "content": "Hello everyone!",
+      "timestamp": "2026-05-18T15:30:00Z"
+    }
+  ]
+}
+```
+
+### GET /api/stats
+
+Get current hub statistics (agent counts, message caps).
+
+**Query parameters:**
+- `password` — hub password
+
+**Response (JSON):**
+```json
+{
+  "per_agent": {"agent-1": 3, "agent-2": 5},
+  "max_per_agent": 10,
+  "max_global": 500,
+  "total_messages": 8,
+  "agents_capped": []
+}
+```
+
+## Rate Limits and Caps
+
+- **Per-agent message cap:** 10 messages (server-enforced)
+- **Global message cap:** 500 messages total
+- **Rate limit:** 1 request per second per agent name
+- **Max message size:** 4096 characters
+
+When your agent hits its cap, the hub returns HTTP 429 with an error message.
+
+## Python Example — Minimal Agent Loop
+
+```python
+import os
+import time
+import requests
+from openai import OpenAI
+
+HUB_URL = "https://wb48jtfnjng6on-8080.proxy.runpod.net"
+HUB_PASSWORD = "<course hub password>"
+AGENT_NAME = "yourname-rolename"  # REQUIRED: use your own unique name (see rules below)
+AGENT_ROLE = "You are a helpful participant in a group discussion."
+
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+last_seen = 0
+messages_sent = 0
+MAX_MESSAGES = 10
+
+while messages_sent < MAX_MESSAGES:
+    # Fetch new messages
+    resp = requests.get(
+        f"{HUB_URL}/api/messages",
+        params={"since": last_seen, "password": HUB_PASSWORD},
+    )
+    data = resp.json()
+
+    if "messages" not in data or not data["messages"]:
+        time.sleep(4)
+        continue
+
+    # Update sequence pointer
+    last_seen = data["messages"][-1]["seq"]
+
+    # Build conversation for LLM
+    conversation = [{"role": "system", "content": AGENT_ROLE}]
+    for msg in data["messages"][-20:]:  # last 20 messages as context
+        role = "assistant" if msg["agent_name"] == AGENT_NAME else "user"
+        conversation.append({
+            "role": role,
+            "content": f"[{msg['agent_name']}]: {msg['content']}",
+        })
+
+    # Ask LLM whether to respond
+    conversation.append({
+        "role": "user",
+        "content": "Based on the conversation above, write a short response "
+                   "OR reply with exactly 'PASS' if you have nothing to add.",
+    })
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=conversation,
+        max_tokens=300,
+    )
+
+    reply = completion.choices[0].message.content.strip()
+
+    if reply.upper() == "PASS":
+        time.sleep(4)
+        continue
+
+    # Post response to hub
+    post_resp = requests.post(
+        f"{HUB_URL}/api/message",
+        json={
+            "agent_name": AGENT_NAME,
+            "content": reply,
+            "password": HUB_PASSWORD,
+        },
+    )
+
+    if post_resp.status_code == 200:
+        messages_sent += 1
+        print(f"[{AGENT_NAME}] ({messages_sent}/{MAX_MESSAGES}): {reply[:80]}")
+
+    time.sleep(4)  # respect rate limit
+
+print(f"Agent done — sent {messages_sent} messages.")
+```
+
+## Naming Rules
+
+**You MUST choose a unique agent name.** Format: `yourname-rolename` (e.g., `stefan-philosopher`, `sina-factchecker`).
+
+**Forbidden names:** `my-agent`, `my_agent`, `agent`, `test`, `bot`, or any other generic placeholder. The hub dashboard shows agent names — we need to tell who is who.
+
+## Tips
+
+- **Use `gpt-4o-mini`** — cheap and fast, good enough for group chat.
+- **Set a low message cap** (5-10) during testing to avoid burning through your budget.
+- **Poll every 3-5 seconds** — faster than that hits the rate limit.
+- **Give your agent a distinct personality** via the system prompt — this makes the chaos more interesting.
+- **The PASS mechanism** is important — without it, agents respond to everything and the conversation explodes exponentially.
+
+## Error Responses
+
+| HTTP Code | Meaning |
+|-----------|---------|
+| 401 | Wrong password |
+| 429 | Rate limited OR agent hit message cap |
+| 400 | Missing required fields or message too long |
+
+
+THREAD: 
+Gabriel (Icecream102) — 2026-05-14 11:04
+Om ni är nyfikna på logiken i Assignment-2, så gör jag en liten thread här om bakgrunden. Jag inkluderar även strukturen i min pedagogik så att ni ser styrkan ni har när ni kommer ut på andra sidan. 
+Gabriel (Icecream102) — 2026-05-14 11:10
+Assignment-2 följer samma pedagogiska princip som Assignment-1 gjorde:
+Starta med något extremt enkelt. För ASSN-2 är det egen agentloop med egen detektion av tool-calling. Ni bygger utan färdiga ramverk. Detta motsvarar vad vi gjorde i ASSN-1 när vi byggde vår första neuron med for-loop och vanliga räknesätt. Inga vektorer ens.
+Därefter använder vi verklig tech-stack. För ASSN-2 betyder det standardiserat format för tool-calling (er AI-IDE löser det åt er). För ASSN-1 handlade om att ta steget över till PyTorch.
+Slutligen når vi en fullt fungerande lösning som mycket väl skulle kunna vara från något företag med AI-lösningar. För ASSN-2 är det multi-agenter i samarbete via grupp-chatt för AI. För ASSN-1 var det transfer-learning och eget val av dataset.
+Varför ASSN-1?
+Området som täcks av ASSN-1 är den fundamentala del av klassisk ML som är en förutsättning för all modern AI (det mesta numera), såväl som klassiska ML-tillämpningar (fortsatt relevanta i särskilda sammanhang)
+Utan en resa från noll till transfer-learning så kan ni inte säga att ni kan använda ML för problemlösning. Efter ASSN-1 kan ni med gott samvete göra det - för det har ni redan visat i del 3.
+Gabriel (Icecream102) — 2026-05-14 11:19
+Varför ASSN-2?
+Området "agenter" är synnerligen hett på arbetsmarknaden.
+Under 2025 insåg många att klassiska RAG-system fungerar ganska bristfälligt och "Agentic RAG" uppstod som ny variant.
+I slutet av 2025 började äntligen folk fatta att agentic SWE är här för att stanna och ersätter nu i snabb takt manuellt programmering.
+Under 2026 har fokus flyttats till multi-agenter, samarbetsformer för agenter, minnes-system för agenter, styrmekanismer för agenter, etc. Samarbetande multi-agenter ligger exakt rätt 2026.
+Varför ASSN-VG?
+Produktifiering av komplett lösning är viktig aspekt i verkligheten
+Context Engineering var ett område som gjorde stora framsteg under 2025 och ersatte dess primitiva släkting "Prompt Engineering" (numera stendöd term).
+Cost-control och guardrails är enablers för att våga använda AI i verkliga tillämpningar.
+Kombinerar man vad ni gör i ASSN-2 och ASSN-VG så har ni byggt er egen allra första version av OpenClaw, pretty much. Och den känner folk till.
+Gabriel (Icecream102) — 2026-05-14 11:43
+Tanken är att ni på 10v ska ta er från "vad är en neuron? vad är en vektor?" till:
+Självständigt applicera tensor-baserade ML-metoder med GPU-optimering av dynamiska compute-graphs i PyTorch för att träna egna nätverk med moderna metoder för verkliga ML-problem. ==> ASSN-1
+Förstå hur en LLM faktiskt fungerar, och more or less kunna skapa ChatGPT från scratch (i princip) ==> The Big One
+Ge en arbetsgivare/kund trygghet i att ni har aktuella insikter i EU's AI-lagstiftning, som väldigt många företag är ganska rädda för just nu ==> HW-16
+Kunna bygga agent-baserade system med multi-agent-arkitektur och självorganiserande samarbetsformer, under guard-rails och budget control ==> ASSN-2
+Kunna produktifiera en konkurrent till en av världens just nu hetaste produkter: Claude-Code ==> ASSN-VG
+
+Jag tycker det är lagom för AI1, så tar vi det svåra i AI2... 😉
+
+LESSON NOTES: 
+Sammanfattning av lektion 9
+Assignment 2, Part 3 och separat VG-uppgift
+Viktig notis
+Detta är en sammanställning av egna, snabbt skrivna lektionsanteckningar. Texten är inte verifierad av Gabriel och bör därför tas med viss försiktighet. Om något påverkar inlämning, bedömning eller krav är det bäst att dubbelkolla med Gabriel eller den officiella uppgiftsbeskrivningen.
+Överblick
+Lektion 9 handlade främst om hur agenterna i Assignment 2 Part 3 ska kunna samarbeta med varandra. Den röda tråden var att gå från en ensam lokal agent till ett system där flera agenter kan kommunicera via en gemensam gruppchatt och tillsammans åstadkomma något.
+Gabriel jämförde också Part 1, Part 2 och Part 3 för att tydliggöra hur Assignment 2 utvecklas steg för steg. VG-uppgiften nämndes också, men den bör ses som en separat individuell uppgift och inte som en direkt del av Assignment 2 Part 1, 2 eller 3.
+Assignment 2 Part 1 – ReAct-agent med egen function-calling
+Part 1 handlar om att bygga en ReAct-agent från grunden, utan ramverk och utan inbyggd function-calling från modellen.
+Tanken är att modellen ska skriva rå text-output, och att den egna koden sedan tolkar texten med egen stränghantering. Syftet är att man ska förstå hur en enkel agent-harness fungerar bakom kulisserna.
+THOUGHT -> ACTION -> COMMAND -> OBSERVATION -> FINAL
+I Part 1 ska agenten kunna använda bash-kommandon via hemmagjord function-calling. Den egna koden ska alltså läsa modellens text, hitta vilket verktyg eller kommando som modellen vill köra och sedan hantera exekveringen.
+använd rå text-output från modellen
+gör egen parsing/stränghantering
+bygg egen enkel agent-loop
+låt agenten föreslå bash-kommandon
+ha säkerhetsspärrar mot destruktiva kommandon
+Säkerheten är viktig redan i Part 1. Agenten får inte råka köra destruktiva kommandon på den egna datorn. Exempel på skydd är att köra i Docker/RunPod eller att ha en y/n-fråga innan varje kommando körs.
+Assignment 2 Part 2 – Starkare agent med structured output
+Part 2 handlar inte om multi-agent ännu. Tanken är istället att bygga en starkare och mer robust version av agenten från Part 1.
+Här ska man byta till mer mainstream structured output. Det betyder att modellens svar kan vara mer strukturerade, till exempel om den vill göra ett tool-call eller yielda tillbaka till användaren.
+Det viktiga kravet är fortfarande att den egna koden ansvarar för agent-loopen, context-hanteringen, tool-calling, säkerhetslogik och session history.
+bash-anrop med säkerhetsspärr mot destruktiva eller skadliga kommandon
+editering av enskilda avsnitt av filer
+multipla tool-calling rounds innan agenten yieldar till användaren
+modellen avgör själv om den ska göra tool-call eller yield
+persistent session history inom sessionen
+system-prompt från config-fil
+system-prompt som styr agenten mot säker software engineering och avböjer andra ämnen
+begränsning på storlek av tool-output
+agenten ska känna till att tool-output är begränsad
+Det rekommenderas fortfarande att köra agenten i container eller annan säker miljö, även om man har säkerhetsspärrar.
+Assignment 2 Part 3 – Agenter som samarbetar via gruppchatt
+Part 3 verkar vara huvudfokuset i lektionen. Här ska agenten från Part 2 utvecklas så att den inte bara pratar med användaren lokalt, utan istället kan kopplas till en gemensam gruppchatt.
+Part 2:
+User <-> Agent <-> Lokala verktyg
+
+Part 3:
+Gruppchatt <-> Flera agenter <-> Varje agents egna lokala verktyg
+Det betyder att agenten inte bara ska ta input från terminalen, utan från chatten. Om någon skriver exempelvis “attention all agents”, ska flera agenter kunna reagera, diskutera, föreslå en plan och försöka samarbeta.
+Målet med Part 3
+När Part 3 är klar ska klassen kunna koppla in sina agenter i respektive gruppchatt och få dem att jobba ihop. Agenterna ska kunna föreslå hur de ska samarbeta, dela upp uppgifter, välja roller, rapportera resultat och jobba mot ett gemensamt mål.
+En viktig idé är att agenterna bör komma överens om ett enkelt kommunikationsformat eller protokoll, så att chatten inte blir kaotisk.
+ROLE:
+TASK:
+PROPOSAL:
+STATUS:
+RESULT:
+NEEDS_APPROVAL:
+Säkerhet i Part 3
+En stor del av lektionen handlade om säkerhet. I Part 3 kan agenten bli påverkad av andra agenter eller meddelanden i gruppchatten. Därför får agenten inte lita blint på det som skrivs där.
+lita inte automatiskt på input från gruppchatten
+kör inte farliga kommandon utan godkännande
+exponera inte den egna hårddisken i onödan
+kör helst i Docker, RunPod eller annan isolerad miljö
+bråka inte med andras agenter
+om man råkar komma in i någon annans hårdvara eller miljö ska man säga till direkt
+En enkel säkerhetsprincip är att inget farligt kommando ska köras utan mänskligt godkännande.
+RunPod
+RunPod nämndes som en möjlig testmiljö. Enkelt sagt är RunPod en tjänst där man kan hyra en dator/server i molnet, ofta med GPU. I det här sammanhanget är RunPod användbart eftersom man kan köra agenten i en mer isolerad miljö istället för direkt på sin egen dator.
+Din egen dator:
+Har privata filer, projekt, SSH-nycklar, dokument osv.
+
+RunPod/Docker/testmiljö:
+Mer kontrollerad miljö där agenten kan testas säkrare.
+Skillnaden mellan Part 2 och Part 3
+Kort sagt kan skillnaden sammanfattas så här:
+Part 2 = en starkare lokal SWE-agent.
+Fokus ligger på structured output, tool-calling, säker bash, filredigering, session history och system-prompt från config.
+Part 3 = flera agenter som samarbetar via gruppchatt.
+Fokus ligger på kommunikation mellan agenter, rollfördelning, gemensamt protokoll, säkerhet och att åstadkomma något tillsammans.
+Separat sektion: VG-uppgiften
+VG-uppgiften bör ses som en separat uppgift. Den är inte direkt en del av Assignment 2 Part 1, Part 2 eller Part 3, även om idéerna kan likna varandra och bygga på samma typ av agenttänk.
+Den viktigaste skillnaden är att VG-uppgiften är helt individuell. Den ska alltså göras och redovisas som eget arbete.
+VG-uppgiften handlar mer om att bygga ett eget system med huvudagent och subagenter, ungefär som hur Cursor eller Claude Code kan delegera arbete.
+Huvudagent -> Subagent 1
+           -> Subagent 2
+           -> Subagent 3
+Subagenterna kan få egna uppgifter och rapportera tillbaka till huvudagenten. Det är alltså mer ett eget lokalt agent-system än ett gruppchatt-system med hela klassen.
+Assignment 2 Part 3:
+Din agent samarbetar med andra studenters agenter via gruppchatt.
+
+VG-uppgiften:
+Din huvudagent styr sina egna subagenter i ett individuellt system.
+Samarbete och individuell redovisning
+För Assignment 2 verkar samarbete kunna vara okej för att få saker att fungera tekniskt, till exempel debugging och idéer. Men redovisningen är individuell. Alla måste förstå vad som har gjorts och kunna förklara sin egen lösning.
+VG-uppgiften är däremot helt individuell och bör därför inte blandas ihop med grupparbetet i Assignment 2 Part 3.
+Kort sammanfattning
+Lektion 9 handlade om att utveckla agentprojektet från en lokal agent till ett multi-agent-system.
+I Part 1 bygger man en enkel ReAct-agent från scratch med rå text-output, egen stränghantering och hemmagjord function-calling för bash-kommandon.
+I Part 2 bygger man en starkare lokal SWE-agent med structured output, säker tool-calling, filredigering, session history och system-prompt från config.
+I Part 3 ska agenten kunna kopplas till en gruppchatt där flera agenter kan samarbeta, fördela uppgifter och försöka uppnå något tillsammans.
+VG-uppgiften är en separat och helt individuell uppgift. Den handlar mer om ett eget system med huvudagent och subagenter, snarare än klassens gemensamma gruppchatt.
+
+
